@@ -29,6 +29,11 @@ AhkCompile(ByRef AhkFile, ExeFile="", ByRef CustomIcon="", BinFile="", UseMPRESS
 	catch
 		Util_Error("Error: Unable to copy AutoHotkeySC binary file to destination.")
 	
+	BinType := AHKType(ExeFileTmp)
+	DerefIncludeVars.A_AhkVersion := BinType.Version
+	DerefIncludeVars.A_PtrSize := BinType.PtrSize
+	DerefIncludeVars.A_IsUnicode := BinType.IsUnicode
+	
 	BundleAhkScript(ExeFileTmp, AhkFile, CustomIcon, fileCP)
 	
 	if FileExist(A_ScriptDir "\mpress.exe") && UseMPRESS
@@ -62,8 +67,8 @@ BundleAhkScript(ExeFile, AhkFile, IcoFile="", fileCP="")
 	PreprocessScript(ScriptBody, AhkFile, ExtraFiles)
 	;FileDelete, %ExeFile%.ahk
 	;FileAppend, % ScriptBody, %ExeFile%.ahk
-	VarSetCapacity(BinScriptBody, BinScriptBody_Len := StrPut(ScriptBody, fileCP) - 1)
-	StrPut(ScriptBody, &BinScriptBody, fileCP)
+	VarSetCapacity(BinScriptBody, BinScriptBody_Len := StrPut(ScriptBody, "UTF-8") - 1)
+	StrPut(ScriptBody, &BinScriptBody, "UTF-8")
 	
 	module := DllCall("BeginUpdateResource", "str", ExeFile, "uint", 0, "ptr")
 	if !module
